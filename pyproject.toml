@@ -1,0 +1,33 @@
+[project]
+description = "SWE-RL: Advancing LLM Reasoning via Reinforcement Learning on Open Software Evolution"
+dynamic = ["dependencies"]
+license = {file = "LICENSE"}
+name = "swerl"
+readme = "README.md"
+requires-python = ">=3.10"
+version = "0.0.1"
+
+[tool.setuptools.packages.find]
+include = ["swerl*"]
+where = ["src"]
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
+
+[tool.mypy]
+check_untyped_defs = true
+follow_imports = "silent"
+ignore_missing_imports = true
+mypy_path = "src"
+packages = ["swerl"]
+python_version = "3.10"
+
+[tool.black]
+include = '\.pyi?$'
+line-length = 88
+target-version = ["py310"]
+
+[tool.isort]
+line_length = 88
+profile = "black"
+skip_gitignore = true
