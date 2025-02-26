@@ -4,6 +4,13 @@
     <a href="https://arxiv.org/abs/2502.18449"><img src="https://img.shields.io/badge/arXiv-2502.18449-b31b1b.svg?style=for-the-badge">
 </p>
 
+<p align="left">
+    🚀&nbsp;<a href="#-quick-start">Quick Start</a>
+    | 🐣&nbsp;<a href="#-agentless-mini">Agentless Mini</a>
+    | 📝&nbsp;<a href="#-citation">Citation</a>
+    | 🙏&nbsp;<a href="#-acknowledgements">Acknowledgements</a>
+</p>
+
 
 Official codebase for our paper: [SWE-RL: Advancing LLM Reasoning via Reinforcement Learning on Open Software Evolution](https://arxiv.org/abs/2502.18449).
 
@@ -65,7 +72,7 @@ print(metadata)
 
 You can also check `swerl.core.reward.calculate_reward`, which is more general and can be paired with any editing format.
 
-## Agentless Mini
+## 🐣 Agentless Mini
 
 ![Agentless Mini](assets/agentless-mini.svg)
 
@@ -82,7 +89,14 @@ The code will be updated shortly.
 }
 ```
 
+## Acknowledgements
+
+[SWE-Gym](https://github.com/SWE-Gym/SWE-Gym),
+[SWE-Fixer](https://github.com/InternLM/SWE-Fixer),
+[SWE-bench](https://github.com/SWE-bench/SWE-bench),
+[Moatless EvalTools](https://eval.moatless.ai/),
+[Neubius SWE-agent](https://nebius.com/blog/posts/training-and-search-for-software-engineering-agents).
+
 ## License
 
 SWE-RL is CC BY-NC 4.0 licensed, as found in the [LICENSE](LICENSE) file.
-
