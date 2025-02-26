@@ -5,14 +5,18 @@
 </p>
 
 <p align="left">
-    🚀&nbsp;<a href="#-quick-start">Quick Start</a>
+    🧐&nbsp;<a href="#-about">About</a>
+    | 🚀&nbsp;<a href="#-quick-start">Quick Start</a>
     | 🐣&nbsp;<a href="#-agentless-mini">Agentless Mini</a>
     | 📝&nbsp;<a href="#-citation">Citation</a>
     | 🙏&nbsp;<a href="#-acknowledgements">Acknowledgements</a>
 </p>
 
+## 🧐 About
 
 Official codebase for our paper: **SWE-RL: Advancing LLM Reasoning via Reinforcement Learning on Open Software Evolution** ([link](https://arxiv.org/abs/2502.18449)).
+
+**SWE-RL** is the first approach to scale reinforcement learning based LLM reasoning for real-world software engineering, leveraging open-source software evolution data and rule-based rewards.
 
 ![Overview of SWE-RL](assets/swerl-overview.svg)
 
