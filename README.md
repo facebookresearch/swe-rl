@@ -1,11 +1,17 @@
 # SWE-RL
 
-Official codebase for our paper: SWE-RL: Advancing LLM Reasoning via Reinforcement Learning on Open Software Evolution.
+<p align="left">
+    <a href="https://arxiv.org/abs/2502.18449"><img src="https://img.shields.io/badge/arXiv-2502.18449-b31b1b.svg?style=for-the-badge">
+</p>
+
+
+Official codebase for our paper: [SWE-RL: Advancing LLM Reasoning via Reinforcement Learning on Open Software Evolution](https://arxiv.org/abs/2502.18449).
 
 ![Overview of SWE-RL](assets/swerl-overview.svg)
 
 > [!NOTE]
 > We have undertaken significant code refactoring to enhance quality and accessibility. However, this may introduce potential inconsistencies with our internal implementation. If you encounter a bug, please file an issue. We are also gradually updating the repo to include additional information.
+
 
 ## Quick start
 
@@ -64,6 +70,17 @@ You can also check `swerl.core.reward.calculate_reward`, which is more general a
 ![Agentless Mini](assets/agentless-mini.svg)
 
 The code will be updated shortly.
+
+## Citation
+
+```bibtex
+@article{wei2025swerl,
+  title={SWE-RL: Advancing LLM Reasoning via Reinforcement Learning on Open Software Evolution}, 
+  author={Yuxiang Wei and Olivier Duchenne and Jade Copet and Quentin Carbonneaux and Lingming Zhang and Daniel Fried and Gabriel Synnaeve and Rishabh Singh and Sida I. Wang},
+  year={2025},
+  journal={arXiv preprint arXiv:2502.18449}
+}
+```
 
 ## License
 
