@@ -12,7 +12,7 @@
 </p>
 
 
-Official codebase for our paper: [SWE-RL: Advancing LLM Reasoning via Reinforcement Learning on Open Software Evolution](https://arxiv.org/abs/2502.18449).
+Official codebase for our paper: **SWE-RL: Advancing LLM Reasoning via Reinforcement Learning on Open Software Evolution** ([link](https://arxiv.org/abs/2502.18449)).
 
 ![Overview of SWE-RL](assets/swerl-overview.svg)
 
@@ -20,10 +20,10 @@ Official codebase for our paper: [SWE-RL: Advancing LLM Reasoning via Reinforcem
 > We have undertaken significant code refactoring to enhance quality and accessibility. However, this may introduce potential inconsistencies with our internal implementation. If you encounter a bug, please file an issue. We are also gradually updating the repo to include additional information.
 
 
-## Quick start
+## 🚀 Quick start
 
 ```bash
-git clone https://github.com/facebookresearch/swe-rl && cd swe-rl
+git clone https://github.com/facebookresearch/we-rl && cd swe-rl
 pip install -e ".[dev]"
 pytest
 ```
@@ -78,7 +78,7 @@ You can also check `swerl.core.reward.calculate_reward`, which is more general a
 
 The code will be updated shortly.
 
-## Citation
+## 📝 Citation
 
 ```bibtex
 @article{wei2025swerl,
@@ -89,7 +89,7 @@ The code will be updated shortly.
 }
 ```
 
-## Acknowledgements
+## 🙏 Acknowledgements
 
 [SWE-Gym](https://github.com/SWE-Gym/SWE-Gym),
 [SWE-Fixer](https://github.com/InternLM/SWE-Fixer),
