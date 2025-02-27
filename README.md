@@ -27,7 +27,7 @@ Official codebase for our paper: **SWE-RL: Advancing LLM Reasoning via Reinforce
 ## 🚀 Quick start
 
 ```bash
-git clone https://github.com/facebookresearch/we-rl && cd swe-rl
+git clone https://github.com/facebookresearch/swe-rl && cd swe-rl
 pip install -e ".[dev]"
 pytest
 ```
