@@ -228,7 +228,7 @@ python -m swerl.agentless_mini.rerank \
 [SWE-Fixer](https://github.com/InternLM/SWE-Fixer),
 [SWE-bench](https://github.com/SWE-bench/SWE-bench),
 [Moatless EvalTools](https://eval.moatless.ai/),
-[Neubius SWE-agent](https://nebius.com/blog/posts/training-and-search-for-software-engineering-agents).
+[Nebius SWE-agent](https://nebius.com/blog/posts/training-and-search-for-software-engineering-agents).
 
 ## License
 
