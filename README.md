@@ -102,7 +102,7 @@ If you want to host your own Hugging Face models, popular choices are [vLLM](htt
 ```bash
 # Host Llama-3.3-70B-Instruct with vLLM
 pip install vllm
-vllm serve meta-llama/Llama-3.1-70B-Instruct --tensor-parallel-size 4 --port 8000
+vllm serve meta-llama/Llama-3.3-70B-Instruct --tensor-parallel-size 4 --port 8000
 # The endpointn url will be http://localhost:8000/v1
 ```
 
