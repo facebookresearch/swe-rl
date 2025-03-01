@@ -16,7 +16,7 @@ class FormatError(Exception):
     pass
 
 
-def extract_thought_solution(output: str) -> tuple[str, str] | str:
+def extract_thought_solution(output: str) -> tuple[str, str]:
     """
     Extract the thought and solution from the output. It is expected to have the following format:
     <think>
