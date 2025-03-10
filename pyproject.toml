@@ -5,6 +5,9 @@ name = "swerl"
 readme = "README.md"
 requires-python = ">=3.10"
 version = "0.0.1"
+dependencies = [
+    "unidiff>=0.7.5",
+]
 
 [tool.setuptools.packages.find]
 include = ["swerl*"]

@@ -2,7 +2,11 @@
 
 import difflib
 import re
+import warnings
 from typing import TypedDict
+
+from unidiff import PatchedFile, PatchSet
+from unidiff.errors import UnidiffParseError
 
 THINK_START = "<think>"
 THINK_END = "</think>"
@@ -30,8 +34,8 @@ def extract_thought_solution(output: str) -> tuple[str, str]:
         if output.count(tag) != 1:
             raise FormatError(f"count of {tag} is not 1")
 
-    thought = output.split("<think>")[1].split("</think>")[0].strip()
-    answer = output.split("<solution>")[1].split("</solution>")[0].strip()
+    thought = output.split(THINK_START)[1].split(THINK_END)[0].strip()
+    answer = output.split(ANSWER_START)[1].split(ANSWER_END)[0].strip()
     if len(thought) == 0:
         raise FormatError("Thought is empty")
     return thought, answer
@@ -91,6 +95,7 @@ def generate_unified_diff(
 def apply_code_change(
     code_context: dict[str, str],
     search_replace_dict: dict[str, list[tuple[str, str]]],
+    silent: bool = False,
 ) -> dict[str, str]:
     """
     Apply the search/replace edits to the code context.
@@ -98,6 +103,7 @@ def apply_code_change(
     Args:
         code_context: A dictionary containing the file path and the content of the code.
         search_replace_dict: A dictionary mapping the file path to the search/replace edits.
+        silent: Whether to suppress the error messages.
 
     Returns:
         A dictionary containing the file path and the new content of the code.
@@ -108,11 +114,11 @@ def apply_code_change(
         for search, replace in search_replaces:
             # Ensure search block can be matched
             # "\n" + search to ensure the indentations are correct
-            if len(search) == len(replace) and search == replace:
+            if not silent and len(search) == len(replace) and search == replace:
                 raise FormatError("Search and replace blocks are identical")
             search = "\n" + search
             replace = "\n" + replace
-            if search not in new_content:
+            if not silent and search not in new_content:
                 raise FormatError(f"Search block not found in the code: {search}")
             new_content = new_content.replace(search, replace)
         # Remove the leading "\n"
@@ -140,6 +146,7 @@ def get_normalized_patch(
         patch = generate_unified_diff(old_content, new_content)
         # Only add the patch if it's not empty
         # NOTE: this should not happen due to the search == replace check in `apply_code_change`
+        # but it can occur in general-purpose usages
         if patch:
             patch_dict[path] = patch
     return patch_dict
@@ -196,6 +203,8 @@ def calculate_reward(
     for code changes in any form, not just search/replace edits. For search/replace edits, use
     `calculate_search_replace_reward`.
 
+    The return value is always within the range of [0, 1].
+
     Args:
         code_context: path -> original content of the file. It doesn't need to
             contain the entire codebase, only the files that are affected by the oracle patch.
@@ -205,17 +214,18 @@ def calculate_reward(
     Returns:
         A float value representing the reward, and a dictionary containing some metadata.
     """
-    try:
-        # Obtain a unified diff for each file, for both the predicted and the oracle patch
-        oracle_patch = get_normalized_patch(code_context, oracle_new_content)
-        pred_patch = get_normalized_patch(code_context, pred_new_content)
-        # Calculate the reward based on the similarity between the predicted and the oracle patch
-        similarities = compute_change_similarities(pred_patch, oracle_patch)
-        assert len(similarities) > 0
-        reward = sum(map(lambda x: x["similarity"], similarities)) / len(similarities)
-        return reward, dict(similarities=similarities)
-    except FormatError as e:
-        return -1.0, dict(error=str(e))
+    # Obtain a unified diff for each file, for both the predicted and the oracle patch
+    oracle_patch = get_normalized_patch(code_context, oracle_new_content)
+    pred_patch = get_normalized_patch(code_context, pred_new_content)
+    # Calculate the reward based on the similarity between the predicted and the oracle patch
+    similarities = compute_change_similarities(pred_patch, oracle_patch)
+    # assert len(similarities) > 0
+    # This means oracle_patch and pred_patch are both empty, then they are identical and we reward 1.0
+    if len(similarities) == 0:
+        assert len(oracle_patch) == 0 and len(pred_patch) == 0
+        return 1.0, dict(similarities=[])
+    reward = sum(map(lambda x: x["similarity"], similarities)) / len(similarities)
+    return reward, dict(similarities=similarities)
 
 
 def calculate_search_replace_reward(
@@ -258,3 +268,75 @@ def calculate_search_replace_reward(
         return reward, metadata
     except FormatError as e:
         return -1.0, dict(error=str(e))
+
+
+def get_filelevel_diff(patch_text: str) -> dict[str, str]:
+    """
+    Convert a unified diff text into a dictionary of file patches.
+    """
+    try:
+        patch = PatchSet(patch_text)
+    except UnidiffParseError:
+        return {}
+    except Exception as e:
+        # NOTE: sometimes unidiff throws other exceptions (e.g. UnboundLocalError) than
+        # UnidiffParseError, which is unexpected, but we should still handle it.
+        warnings.warn(f"Unexpected unidiff parsing error: {str(e)}")
+        return {}
+    result = dict[str, str]()
+    for patchfile in patch:
+        patchfile: PatchedFile = patchfile
+        if patchfile.is_binary_file:
+            # We don't consider binary files
+            continue
+        if patchfile.is_rename:
+            # Add a special header for renamed files
+            source_file = patchfile.source_file
+            target_file = patchfile.target_file
+            if source_file.startswith("a/"):
+                source_file = source_file[2:]
+            if target_file.startswith("b/"):
+                target_file = target_file[2:]
+            header = f"rename from {source_file} to {target_file}"
+            path = source_file
+        else:
+            header = ""
+            path = patchfile.path
+        body = "\n".join(str(hunk).strip() for hunk in patchfile)
+        content = header + "\n" + body
+        content = content.strip()
+        result[path] = content
+    return result
+
+
+def calculate_reward_unidiff(
+    oracle_patches: list[str], pred_patches: list[str]
+) -> tuple[float, dict]:
+    """
+    Compute the SWE-RL reward given two sets of unified diffs.
+
+    The return value is always within the range of [0, 1].
+
+    Args:
+        oracle_patches: A list of oracle diffs.
+        pred_patches: A list of predicted diffs.
+
+    Returns:
+        A float value representing the reward, and a dictionary containing some metadata.
+    """
+    # Calculate the reward based on the similarity between the predicted and the oracle patch
+    pred_patch_dict = dict[str, str]()
+    oracle_patch_dict = dict[str, str]()
+
+    for patch_text in oracle_patches:
+        oracle_patch_dict.update(get_filelevel_diff(patch_text))
+
+    for patch_text in pred_patches:
+        pred_patch_dict.update(get_filelevel_diff(patch_text))
+
+    similarities = compute_change_similarities(pred_patch_dict, oracle_patch_dict)
+    if len(similarities) == 0:
+        assert len(pred_patch_dict) == 0 and len(oracle_patch_dict) == 0
+        return 1.0, dict(similarities=[])
+    reward = sum(map(lambda x: x["similarity"], similarities)) / len(similarities)
+    return reward, dict(similarities=similarities)

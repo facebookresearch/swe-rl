@@ -1,6 +1,6 @@
 # Copyright (c) Meta Platforms, Inc. and affiliates. All rights reserved.
 
-from swerl.core.reward import calculate_search_replace_reward
+from swerl.core.reward import calculate_reward_unidiff, calculate_search_replace_reward
 
 FILE_A = """
 def add(a, b):
@@ -187,3 +187,77 @@ return a - b
             output=output,
         )
         assert reward == -1.0, meta
+
+
+DIFF_1 = """diff --git a/foo.txt b/foo.txt
+index 83db48f..f73504f 100644
+--- a/foo.txt
++++ b/foo.txt
+@@ -1,4 +1,4 @@
+-Hello world
++Hello World
+ This is a file
+-With some lines
++With some changed lines
+ End
+"""
+
+
+DIFF_2 = """diff --git a/foo.txt b/foo.txt
+index 83db48f..f73504f 100644
+--- a/foo.txt
++++ b/foo.txt
+@@ -1,4 +1,4 @@
+-Hello world
++Hello World
+ This is a file
+-With some lines
++With some changed
+ End
+"""
+
+
+DIFF_3 = """diff --git a/bar.txt b/bar.txt
+index 83db48f..f73504f 100644
+--- a/bar.txt
++++ b/bar.txt
+@@ -1,4 +1,4 @@
+-Hello world
++Hello World
+ This is a file
+-With some lines
++With some changed
+ End
+"""
+
+
+def test_reward_unidiff():
+    reward, meta = calculate_reward_unidiff(
+        oracle_patches=[DIFF_1],
+        pred_patches=[DIFF_2],
+    )
+    assert reward > 0.9, meta
+
+
+def test_reward_unidiff_same():
+    reward, meta = calculate_reward_unidiff(
+        oracle_patches=[DIFF_1],
+        pred_patches=[DIFF_1],
+    )
+    assert reward == 1.0, meta
+
+
+def test_reward_unidiff_different():
+    reward, meta = calculate_reward_unidiff(
+        oracle_patches=[DIFF_1],
+        pred_patches=[DIFF_3],
+    )
+    assert reward == 0.0, meta
+
+
+def test_reward_unidiff_half():
+    reward, meta = calculate_reward_unidiff(
+        oracle_patches=[DIFF_1],
+        pred_patches=[DIFF_1, DIFF_3],
+    )
+    assert reward == 0.5, meta

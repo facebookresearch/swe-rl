@@ -35,6 +35,14 @@ pytest
 The code currently provides our prompt templates and the implementation of the reward function based on sequence similarity.
 You can find them in [src/swerl/core/prompts.py](src/swerl/core/prompts.py) and [src/swerl/core/reward.py](src/swerl/core/reward.py) respectively.
 
+We provide three reward function API:
+
+1. `calculate_search_replace_reward`: calculates the similarity between search/replace changes and oracle changes (this's what we used in the paper);
+2. `calculate_reward_unidiff`: calculates the similarity between two sets of unified diffs;
+3. `calculate_reward`: a more general API that can be paired with any editing format.
+
+### Reward for search/replace changes
+
 A toy example on how you can use the reward function in your own project:
 
 ``````python
@@ -74,7 +82,56 @@ assert reward == 1.0
 print(metadata)
 ``````
 
-You can also check `swerl.core.reward.calculate_reward`, which is more general and can be paired with any editing format.
+### Reward for unified diff
+
+Check `swerl.core.reward.calculate_reward_unidiff`. Here is the signature:
+
+```python
+def calculate_reward_unidiff(
+    oracle_patches: list[str], pred_patches: list[str]
+) -> tuple[float, dict]:
+    """
+    Compute the SWE-RL reward given two set of unified diffs.
+
+    The return value is always within the range of [0, 1].
+
+    Args:
+        oracle_patches: A list of oracle diffs.
+        pred_patches: A list of predicted diffs.
+
+    Returns:
+        A float value representing the reward, and a dictionary containing some metadata.
+    """
+```
+
+### General version
+
+Check `swerl.core.reward.calculate_reward`. Here is the signature:
+
+```python
+def calculate_reward(
+    code_context: dict[str, str],
+    oracle_new_content: dict[str, str],
+    pred_new_content: dict[str, str],
+) -> tuple[float, dict]:
+    """
+    Compute the SWE-RL reward given the code context, oracle patch, and the model output.
+    Note that this function is a general version of the reward calculation, which can be used
+    for code changes in any form, not just search/replace edits. For search/replace edits, use
+    `calculate_search_replace_reward`.
+
+    The return value is always within the range of [0, 1].
+
+    Args:
+        code_context: path -> original content of the file. It doesn't need to
+            contain the entire codebase, only the files that are affected by the oracle patch.
+        oracle_new_content: path -> oracle new content of the file after change.
+        pred_new_content: path -> predicted new content of the file after change.
+
+    Returns:
+        A float value representing the reward, and a dictionary containing some metadata.
+    """
+```
 
 ## 🐣 Agentless Mini
 
