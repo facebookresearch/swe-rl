@@ -195,6 +195,8 @@ Below is the simplest setup where oracle files are provided for repair. This can
 # different shards with different compute nodes to parallelize the evaluation.
 # Below, we set num_shards to 125, so each shard will have (500 / 125) instances, where
 # 500 is the number of problems in SWE-bench Verified.
+#
+# NOTE: for SWE-bench Lite, please specify --dataset princeton-nlp/SWE-bench_Lite
 python -m swerl.agentless_mini.repair \
     --loc_file resources/sweb_verified_gt_loc.jsonl \
     --output_folder demo_gt_repair \
@@ -221,6 +223,7 @@ You can also run the full pipeline. We show a greedy-decoding demo below:
 ```bash
 NUM_SAMPLES=1
 COMMON_ARGS=(
+    # NOTE: for SWE-bench Lite, please specify --dataset princeton-nlp/SWE-bench_Lite
     --shard 0
     --num_shards 125
     --num_samples ${NUM_SAMPLES}

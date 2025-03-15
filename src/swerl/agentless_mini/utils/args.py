@@ -13,9 +13,9 @@ class BenchArgs:
     num_shards: int = field(metadata={"help": "The total number of shards"})
     # We've only tested on the Verified subset currently,
     # but you can use shard/num_shards to split the dataset
-    dataset: Literal["princeton-nlp/SWE-bench_Verified"] = field(
-        default="princeton-nlp/SWE-bench_Verified"
-    )
+    dataset: Literal[
+        "princeton-nlp/SWE-bench_Lite", "princeton-nlp/SWE-bench_Verified"
+    ] = field(default="princeton-nlp/SWE-bench_Verified")
 
     def load(self) -> Dataset:
         dataset = load_dataset(self.dataset, split="test")
